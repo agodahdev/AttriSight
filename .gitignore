@@ -7,4 +7,12 @@ __pycache__/
 node_modules/
 .github/
 cloudinary_python.txt
-kaggle.json
+kaggle.jso
+.venv/
+.ipynb_checkpoints/
+.DS_Store
+*.ipynb
+.env
+data/processed/*
+artifacts/*
+versions/*
