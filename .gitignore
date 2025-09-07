@@ -16,3 +16,5 @@ kaggle.jso
 data/processed/*
 artifacts/*
 versions/*
+ .
+ 
