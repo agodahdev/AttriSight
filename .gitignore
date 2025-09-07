@@ -12,6 +12,7 @@ kaggle.jso
 .ipynb_checkpoints/
 .DS_Store
 *.ipynb
+!jupyter_notebooks/01_data_collection.ipynb
 .env
 data/processed/*
 artifacts/*
