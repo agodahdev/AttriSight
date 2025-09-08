@@ -27,4 +27,4 @@ def run():
     import plotly.express as px
     st.plotly_chart(px.imshow(corr, text_auto=True, aspect="auto", title="Correlation heatmap"), use_container_width=True)
 
-    st.caption("Tip: Stronger absolute correlation with 'target' suggests more predictive power (but watch for leakage).")
+ 
