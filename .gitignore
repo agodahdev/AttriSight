@@ -13,6 +13,7 @@ kaggle.jso
 .DS_Store
 *.ipynb
 !jupyter_notebooks/01_data_collection.ipynb
+! jupyter_notebooks/02_clean_and_target.ipynb
 .env
 data/processed/*
 artifacts/*
