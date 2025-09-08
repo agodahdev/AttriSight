@@ -37,24 +37,31 @@ def run():
     if "target" not in df.columns and "Attrition" in df.columns:
         df["target"] = df["Attrition"].map({"Yes":1,"No":0})
 
-    # H1: OverTime proportions
-    st.subheader("H1: OverTime vs Attrition")
-    h1 = df.groupby("OverTime")["target"].mean().rename("attrition_rate").to_frame().reset_index()
+    
+    # H1 details (rate + count + bar)
+    h1 = (df.groupby("OverTime")["target"]
+        .agg(rate="mean", n="size")
+        .reset_index())
+    h1["rate_pct"] = (100*h1["rate"]).round(1)
     st.dataframe(h1, use_container_width=True)
+    st.bar_chart(h1.set_index("OverTime")["rate"])
 
-    # H2: JobSatisfaction (if available)
-    st.subheader("H2: JobSatisfaction vs Attrition")
+    # H2 details (if present)
     if "JobSatisfaction" in df.columns:
-        h2 = df.groupby("JobSatisfaction")["target"].mean().rename("attrition_rate").to_frame().reset_index()
+        h2 = (df.groupby("JobSatisfaction")["target"]
+            .agg(rate="mean", n="size")
+            .reset_index()
+            .sort_values("JobSatisfaction"))
+        h2["rate_pct"] = (100*h2["rate"]).round(1)
         st.dataframe(h2, use_container_width=True)
-    else:
-        st.info("JobSatisfaction not present in dataset.")
-    
-    # H3: Age group
-    st.subheader("H3: Age group (≤30 vs >30) vs Attrition")
+        st.bar_chart(h2.set_index("JobSatisfaction")["rate"])
+
+    # H3 details (age groups)
     age_group = (df["Age"] <= 30).map({True:"<=30", False:">30"})
-    h3 = df.assign(AgeGroup=age_group).groupby("AgeGroup")["target"].mean().rename("attrition_rate").to_frame().reset_index()
+    h3 = (df.assign(AgeGroup=age_group).groupby("AgeGroup")["target"]
+        .agg(rate="mean", n="size")
+        .reset_index()
+        .sort_values("AgeGroup"))
+    h3["rate_pct"] = (100*h3["rate"]).round(1)
     st.dataframe(h3, use_container_width=True)
-    
-    
-    
+    st.bar_chart(h3.set_index("AgeGroup")["rate"])
