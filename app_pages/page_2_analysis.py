@@ -19,3 +19,12 @@ def run():
     num = st.selectbox("Numeric", ["Age","MonthlyIncome","DistanceFromHome","TotalWorkingYears","YearsAtCompany","NumCompaniesWorked","PercentSalaryHike"])
     st.caption("If distributions differ across 'Yes'/'No', the variable may relate to attrition.")
     st.plotly_chart(px.box(df, x="Attrition", y=num, points="all"), use_container_width=True)
+
+    st.divider()
+    st.subheader("Correlation (numeric features)")
+    num_cols = ["Age","MonthlyIncome","DistanceFromHome","TotalWorkingYears","YearsAtCompany","NumCompaniesWorked","PercentSalaryHike"]
+    corr = df[num_cols + ["target"]].corr(numeric_only=True)
+    import plotly.express as px
+    st.plotly_chart(px.imshow(corr, text_auto=True, aspect="auto", title="Correlation heatmap"), use_container_width=True)
+
+    st.caption("Tip: Stronger absolute correlation with 'target' suggests more predictive power (but watch for leakage).")
