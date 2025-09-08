@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from src.config import DATA_PROCESSED
+from src.config import DATA_PROCESSED    
 
 def run():
     st.title("Project Summary")
