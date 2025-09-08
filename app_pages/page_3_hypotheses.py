@@ -1,5 +1,17 @@
 import streamlit as st
 import pandas as pd
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+READY = ROOT / "data/processed/hr_attrition_ready.parquet"
+PROCESSED = ROOT / "data/processed/hr_attrition.parquet"
+
+def _load_df():
+    """Load the processed dataset from an absolute path."""
+    for p in (READY, PROCESSED):
+        if p.exists():
+            return pd.read_parquet(p)
+    return None
 
 def run():
     st.title("Project Hypotheses & Validation")
@@ -44,4 +56,5 @@ def run():
     h3 = df.assign(AgeGroup=age_group).groupby("AgeGroup")["target"].mean().rename("attrition_rate").to_frame().reset_index()
     st.dataframe(h3, use_container_width=True)
     
-    st.info("Add results from notebooks here (proportions and simple stats).")
+    
+    
