@@ -6,9 +6,10 @@ def run():
     st.title("Project Summary")
     st.write("""
     **Client requirements**
-    1) Understand factors linked with employee attrition.
-    2) Predict attrition risk for an employee profile.
+     - **BR#1 (EDA):** Understand factors linked with employee attrition.
+     - **BR#2 (ML):** Predict attrition risk for an employee profile in a dashboard.
     """)
+    
     if DATA_PROCESSED.exists():
         df = pd.read_parquet(DATA_PROCESSED)
         st.subheader("Dataset at a glance")
