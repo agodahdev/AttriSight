@@ -15,6 +15,7 @@ kaggle.jso
 !jupyter_notebooks/01_data_collection.ipynb
 !jupyter_notebooks/02_clean_and_target.ipynb
 !jupyter_notebooks/03_train_tune_export.ipynb
+!jupyter_notebooks/04_evaluate_and_release.ipynb
 .env
 data/processed/*
 artifacts/*
