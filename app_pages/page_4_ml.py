@@ -42,9 +42,33 @@ def _load_dataset():
             return df, Path(p)
     return None, None
 
+def _band(prob: float):
+    """Turn a probability into a simple risk label and icon."""
+    if prob < 0.35:
+        return "Low", "✅"
+    elif prob < 0.60:
+        return "Medium", "⚠️"
+    else:
+        return "High", "🔴"
+
 def run():
     st.title("Attrition Predictor (ML)")
-    st.warning("Model not found yet. Train & export via Notebook 03 before using this page.")
+    # 1) Load model + feature names
+    try:
+        pipe, feats = _load_artifacts()
+    except Exception as e:
+        st.error("Model not found yet. Train & export via Notebook 03 before using this page.")
+        st.caption(f"Expected: {MODEL_FILE.relative_to(ROOT)} and {FEATURES_FILE.relative_to(ROOT)}")
+        st.caption(f"Error: {e}")
+        return
+
+    # 2) Load data (used to build sensible input widgets)
+    df, src = _load_dataset()
+    if df is None:
+        st.warning("No data found in data/processed or data/raw. Run Notebook 01–02.")
+        return
+    st.caption(f"Using dataset: `{src.relative_to(ROOT)}`")
+
 
     # inputs
     age = st.number_input("Age", 18, 70, 30)
