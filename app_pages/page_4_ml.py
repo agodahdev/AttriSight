@@ -4,15 +4,43 @@ import joblib
 import json
 from pathlib import Path
 
-MODEL_PATH = Path("artifacts/v1/rf_pipeline.joblib")
-FEATS_PATH = Path("artifacts/v1/features.json")
+# Try to import shared paths. If that fails, use local fallbacks.
+try:
+    from src.config import (
+        ROOT, READY_PARQUET, PROCESSED_PARQUET, RAW_CSV,
+        MODEL_FILE, FEATURES_FILE
+    )
+except Exception:
+    ROOT = Path(__file__).resolve().parents[1]
+    READY_PARQUET     = ROOT / "data" / "processed" / "hr_attrition_ready.parquet"
+    PROCESSED_PARQUET = ROOT / "data" / "processed" / "hr_attrition.parquet"
+    RAW_CSV           = ROOT / "data" / "raw" / "WA_Fn-UseC_-HR-Employee-Attrition.csv"
+    MODEL_FILE        = ROOT / "artifacts" / "v1" / "rf_pipeline.joblib"
+    FEATURES_FILE     = ROOT / "artifacts" / "v1" / "features.json"
+    
+# ---- Cache helpers ----
+@st.cache_resource
+def _load_artifacts():
+    """Load the trained model and the feature list once."""
+    pipe = joblib.load(MODEL_FILE)
+    feats = json.loads(Path(FEATURES_FILE).read_text())
+    return pipe, feats
 
-def load():
-    try:
-        return joblib.load(MODEL_PATH), json.loads(FEATS_PATH.read_text())
-    except Exception:
-        return None, None
-
+@st.cache_data
+def _load_dataset():
+    """Load a dataset (prefer ready → processed → raw)."""
+    for p in (READY_PARQUET, PROCESSED_PARQUET, RAW_CSV):
+        if Path(p).exists():
+            if Path(p).suffix == ".parquet":
+                df = pd.read_parquet(p)
+            else:
+                df = pd.read_csv(p)
+            # Make sure we have a 0/1 target
+            if "target" not in df.columns and "Attrition" in df.columns:
+                df = df.copy()
+                df["target"] = df["Attrition"].map({"Yes": 1, "No": 0})
+            return df, Path(p)
+    return None, None
 
 def run():
     st.title("Attrition Predictor (ML)")
