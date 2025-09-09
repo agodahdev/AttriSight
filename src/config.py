@@ -1,6 +1,6 @@
 from pathlib import Path
 
-
+ROOT = Path(__file__).resolve().parents[1]
 DATA_PROCESSED = Path("data/processed/hr_attrition.parquet")
 DATA_READY = Path("data/processed/hr_attrition_ready.parquet")
 
