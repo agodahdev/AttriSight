@@ -1,5 +1,6 @@
 from pathlib import Path
 
+
 DATA_PROCESSED = Path("data/processed/hr_attrition.parquet")
 DATA_READY = Path("data/processed/hr_attrition_ready.parquet")
 
