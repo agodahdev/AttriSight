@@ -14,7 +14,7 @@ PROCESSED_PARQUET = DATA_PROCESSED / "hr_attrition.parquet"
 READY_PARQUET     = DATA_PROCESSED / "hr_attrition_ready.parquet"
 
 # Artifacts and assets
-ARTIFACT_DIR = ROOT / "artifacts" / "v1"
+ARTIFACTS_DIR = ROOT / "artifacts" / "v1"
 ASSETS_DIR   = ROOT / "assets"
 
 # Model files
