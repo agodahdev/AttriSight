@@ -69,7 +69,43 @@ def run():
         return
     st.caption(f"Using dataset: `{src.relative_to(ROOT)}`")
 
+    # Check that all training features exist in the current data
+    missing = [c for c in feats if c not in df.columns]
+    if missing:
+        st.error(f"Missing columns in data: {missing}")
+        st.caption("Recreate the ready parquet in Notebook 02 so it matches the training features.")
+        return
+    # 3) Simple form: one input per feature (numbers → number input, text/categorical → dropdown)
+    st.subheader("Enter an employee profile")
+    st.caption("Dropdowns show values seen in the dataset.")
+    user_vals = {}
 
+    with st.form("ml_form", clear_on_submit=False):
+        cols = st.columns(2)  # nicer layout
+        for i, feat in enumerate(feats):
+            col = cols[i % 2]
+            ser = df[feat]
+
+            if pd.api.types.is_numeric_dtype(ser):
+                # Basic numeric bounds and default
+                vmin = float(np.nanmin(ser)) if ser.notna().any() else 0.0
+                vmax = float(np.nanmax(ser)) if ser.notna().any() else 100.0
+                vdef = float(np.nanmedian(ser)) if ser.notna().any() else 0.0
+                step = 1.0 if ser.dtype.kind in "iu" else 0.1
+                with col:
+                    user_vals[feat] = st.number_input(
+                        feat, min_value=vmin, max_value=vmax, value=vdef, step=step,
+                        key=f"in_num_{feat}"
+                    )
+            else:
+                # Categorical options from the data
+                opts = sorted([str(x) for x in ser.dropna().unique().tolist()])
+                default_idx = 0 if opts else None
+                with col:
+                    user_vals[feat] = st.selectbox(
+                        feat, options=opts, index=default_idx if opts else None,
+                        key=f"in_cat_{feat}"
+                    )
     # inputs
     age = st.number_input("Age", 18, 70, 30)
     income = st.number_input("MonthlyIncome", 1000, 25000, 5000, step=500)
