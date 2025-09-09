@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 import joblib
 import json
 from pathlib import Path
@@ -106,32 +107,25 @@ def run():
                         feat, options=opts, index=default_idx if opts else None,
                         key=f"in_cat_{feat}"
                     )
-    # inputs
-    age = st.number_input("Age", 18, 70, 30)
-    income = st.number_input("MonthlyIncome", 1000, 25000, 5000, step=500)
-    dist = st.number_input("DistanceFromHome", 0, 50, 5)
-    twy = st.number_input("TotalWorkingYears", 0, 40, 5)
-    yac = st.number_input("YearsAtCompany", 0, 40, 3)
-    ncomp = st.number_input("NumCompaniesWorked", 0, 20, 2)
-    hike = st.number_input("PercentSalaryHike", 0, 100, 15)
-    overtime = st.selectbox("OverTime", ["Yes","No"])
-    jobrole = st.selectbox("JobRole", ["Sales Executive","Research Scientist","Laboratory Technician","Manufacturing Director","Healthcare Representative","Manager","Sales Representative","Research Director","Human Resources"])
-    mstat = st.selectbox("MaritalStatus", ["Single","Married","Divorced"])
-    btravel = st.selectbox("BusinessTravel", ["Non-Travel","Travel_Rarely","Travel_Frequently"])
-    dept = st.selectbox("Department", ["Sales","Research & Development","Human Resources"])
-    efield = st.selectbox("EducationField", ["Life Sciences","Medical","Marketing","Technical Degree","Other","Human Resources"])
-    gender = st.selectbox("Gender", ["Male","Female"])
-    jlevel = st.selectbox("JobLevel", [1,2,3,4,5])
+        submitted = st.form_submit_button("Predict")
 
-    row = {"Age":age,"MonthlyIncome":income,"DistanceFromHome":dist,
-           "TotalWorkingYears":twy,"YearsAtCompany":yac,"NumCompaniesWorked":ncomp,
-           "PercentSalaryHike":hike,"OverTime":overtime,"JobRole":jobrole,
-           "MaritalStatus":mstat,"BusinessTravel":btravel,"Department":dept,
-           "EducationField":efield,"Gender":gender,"JobLevel":jlevel}
+    if not submitted:
+        st.info("Fill the form and click **Predict**.")
         
-    X = pd.DataFrame([row])[feats]
-    if st.button("Predict"):
-        prob = pipe.predict_proba(X)[0,1]
-        band = "High risk" if prob >= 0.60 else "Medium risk" if prob >= 0.35 else "Low risk"
-        st.metric("Attrition probability", f"{prob:.2%}")
-        st.success(f"Risk category: **{band}**")
+    
+    # 4) Predict
+    X = pd.DataFrame([user_vals])[feats]  # keep exact training feature order
+    try:
+        prob = float(pipe.predict_proba(X)[0, 1])
+    except Exception as e:
+        st.error(f"Prediction failed: {e}")
+        st.stop()
+
+    # 5) Show result
+    band, icon = _band(prob)
+    st.subheader("Result")
+    st.metric(label="Attrition probability", value=f"{prob:.2%}")
+    st.markdown(f"**Risk band:** {icon} **{band}**")
+    st.caption("Note: thresholds are examples (Low < 0.35, Medium 0.35–0.59, High ≥ 0.60). Adjust with stakeholders.")
+    
+    
