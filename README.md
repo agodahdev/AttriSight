@@ -114,6 +114,11 @@ Technical page shows AUC and whether the goal is met.
 - Threshold sweep table (accuracy/precision/recall/F1)
 - Live CM slider
 
+## Versioned Artifacts
+* Trained model and feature list live under `artifacts/v1/`.
+* Images and tables for the app live under `assets/`.
+* This keeps releases tidy and reproducible.
+
 ## Manual Testing
 
 ### A. App starts
