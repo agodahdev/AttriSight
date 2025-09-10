@@ -83,7 +83,22 @@ Run in order:
 
 *(Exact p-values appear on the Hypotheses page if SciPy is installed.)*
 
+## Modeling Summary
 
+### **Approach**
+Binary classification using **Random Forest** with a clean **ColumnTransformer**:
+- **Numeric:** impute median + scale
+- **Categorical:** impute most_frequent + one-hot (ignore unknowns)
+
+### **Baselines**
+Compared Logistic Regression vs Random Forest.
+
+### **Tuning**
+Grid search over ≥6 hyperparameters (each with ≥3 values) for Distinction:
+- `n_estimators`, `max_depth`, `min_samples_split`, `min_samples_leaf`, `max_features`, `criterion`
+
+### **Why these params**
+They control model complexity (depth/leaves/split), ensemble size (`n_estimators`), feature sampling (`max_features`), and split measure (`criterion`).
 
 ## How to use this repo
 
