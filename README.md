@@ -238,6 +238,32 @@ Below are the common issues we hit during build, with quick fixes.
 * **Cause:** Ready parquet not created yet.
 * **Fix:** Run **NB02** to create `hr_attrition_ready.parquet`.
 
+## Credits & Resources
+
+
+### Machine Learning & Mathematics
+* **Scikit-learn Documentation:** [https://scikit-learn.org/stable/](https://scikit-learn.org/stable/) - Official ML library documentation
+* **Random Forest Algorithm:** [https://scikit-learn.org/stable/modules/ensemble.html#forest](https://scikit-learn.org/stable/modules/ensemble.html#forest) - Ensemble methods guide
+* **ROC-AUC Explained:** [https://scikit-learn.org/stable/auto_examples/model_selection/plot_roc.html](https://scikit-learn.org/stable/auto_examples/model_selection/plot_roc.html) 
+
+### Data Science Resources
+* **Pandas Documentation:** [https://pandas.pydata.org/docs/](https://pandas.pydata.org/docs/) - Data manipulation and analysis
+* **Seaborn Gallery:** [https://seaborn.pydata.org/examples/index.html](https://seaborn.pydata.org/examples/index.html) - Statistical data visualization
+* **Kaggle Learn:** [https://www.kaggle.com/learn](https://www.kaggle.com/learn) - Free micro-courses on data science
+
+### Streamlit & Deployment
+* **Streamlit Documentation:** [https://docs.streamlit.io/](https://docs.streamlit.io/) - Interactive web app framework
+* **Streamlit Gallery:** [https://streamlit.io/gallery](https://streamlit.io/gallery) - Community app examples
+
+### Dataset
+* **Original Dataset:** [IBM HR Analytics Employee Attrition & Performance](https://www.kaggle.com/datasets/pavansubhasht/ibm-hr-analytics-attrition-dataset) - Kaggle dataset used in this project
+
+
+### Special Thanks
+* **Code Institute** - For the comprehensive Predictive Analytics and Machine Learning course
+* **Kaggle Community** - For providing high-quality datasets and notebooks
+* **Open Source Contributors** - For maintaining the amazing Python data science ecosystem
+
 
 ## How to use this repo
 
