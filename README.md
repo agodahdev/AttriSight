@@ -19,6 +19,10 @@ A simple web app that helps HR **understand why people leave** and **predict who
 - **Success:** Model reaches or beats the ROC-AUC goal, and insights are understandable enough to guide action (e.g., focus on overtime and low satisfaction groups).
 
 
+## Data Source
+
+- **Dataset:** IBM HR Analytics Employee Attrition & Performance  
+- Kaggle: `pavansubhasht/ibm-hr-analytics-attrition-dataset`
 
 
 ## How to use this repo
