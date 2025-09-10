@@ -18,7 +18,7 @@ A simple web app that helps HR **understand why people leave** and **predict who
 - **Decision support:** Risk band thresholds (default: Low < 0.35, Medium 0.35–0.59, High ≥ 0.60). These can be adjusted with stakeholders.
 - **Success:** Model reaches or beats the ROC-AUC goal, and insights are understandable enough to guide action (e.g., focus on overtime and low satisfaction groups).
 
-## 6) Reproduce the Project (Notebooks)
+## Reproduce the Project (Notebooks)
 
 Run in order:
 
@@ -34,11 +34,21 @@ Run in order:
 4. **04_evaluate_and_release.ipynb**
    - Save **ROC** and **Confusion Matrix** images + **threshold_metrics.csv** to `assets/`.
 
+## Dashboard Design (pages & content)
 
-## Data Source
+### **Project Summary**
+- Project goal, client requirements, dataset preview + where files were loaded from.
 
-- **Dataset:** IBM HR Analytics Employee Attrition & Performance  
-- Kaggle: `pavansubhasht/ibm-hr-analytics-attrition-dataset`
+### **Workforce Analysis (BR#1)**
+- Filters, bar charts (e.g., OverTime), box plot (e.g., Age), correlation heatmap (numeric).
+- Caption under each plot explaining what to look for.
+
+### **Project Hypotheses**
+- **H1:** OverTime → higher attrition (shows rates, clear KPIs, gap, and callout).
+- **H2:** Low JobSatisfaction → higher attrition.
+- **H3:** ≤30 yrs → higher attrition.
+- (Optional) Chi-square p-values if SciPy installed.
+
 
 
 ## How to use this repo
