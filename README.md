@@ -67,6 +67,22 @@ Run in order:
 - **Tasks:** build preprocessing + model pipeline, Train/Tune, export, Streamlit form for inputs, risk band.
 - **Pages:** Attrition Predictor (ML), Technical.
 
+## Hypotheses & Validation
+
+### **H1**
+- **Hypothesis:** OverTime=Yes shows higher attrition.
+- **Evidence:** higher rate in table/plot; positive gap KPI; (optional) chi-square p < 0.05.
+
+### **H2**
+- **Hypothesis:** Lower JobSatisfaction relates to higher attrition.
+- **Evidence:** rising rates at low satisfaction levels; (optional) chi-square p < 0.05.
+
+### **H3**
+- **Hypothesis:** Younger group (≤30) shows higher attrition.
+- **Evidence:** higher rate for ≤30 group; (optional) chi-square p < 0.05.
+
+*(Exact p-values appear on the Hypotheses page if SciPy is installed.)*
+
 
 
 ## How to use this repo
