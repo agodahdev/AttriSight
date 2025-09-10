@@ -181,6 +181,24 @@ Below are the common issues we hit during build, with quick fixes.
 * **Cause:** Missing Kaggle login or wrong path.
 * **Fix:** Confirm `~/.kaggle/kaggle.json` exists, re-run the install + download cells, use `-p ../data/raw --unzip`.
 
+### File paths & imports
+
+#### Symptom: `FileNotFoundError: ../data/processed/hr_attrition_ready.parquet`
+* **Cause:** Notebook 02 not run yet.
+* **Fix:** Run NB02 to create the ready parquet.
+
+#### Symptom: `NameError: Path is not defined`
+* **Cause:** Missing `from pathlib import Path` in that cell.
+* **Fix:** Import Path at the top of the cell.
+
+#### Symptom: `ImportError: cannot import name 'RAW_CSV' from src.config`
+* **Cause:** Config variable names didn't match.
+* **Fix:** Standardized names in `src/config.py` and updated pages to import them.
+
+#### Symptom: `ARTIFACTS_DIR` or `DATA_READY` not defined
+* **Cause:** Inconsistent config during refactor.
+* **Fix:** Use a single `config.py` with `ROOT`, `RAW_CSV`, `PROCESSED_PARQUET`, `READY_PARQUET`, `ARTIFACTS/V1` paths.
+
 
 ## How to use this repo
 
