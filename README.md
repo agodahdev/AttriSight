@@ -2,11 +2,21 @@
 
 A simple web app that helps HR **understand why people leave** and **predict who might leave next**.
 
-## 1) Overview & Goals
+## Overview & Goals
 
 - **Explain (BR#1):** Show clear charts (bars / box / heatmap) to see which factors relate to attrition.
 - **Predict (BR#2):** Enter an employee profile and get an **attrition probability** + **risk band** (Low/Medium/High).
 - **Audience:** HR / People Analytics / managers.
+
+## Business Case (in ML terms)
+
+- **Problem:** Reduce employee attrition by identifying risk early.
+- **Users:** HR analysts and managers.
+- **Inputs (features):** e.g., `Age`, `MonthlyIncome`, `DistanceFromHome`, `TotalWorkingYears`, `YearsAtCompany`, `NumCompaniesWorked`, `PercentSalaryHike`, plus categorical fields such as `OverTime`, `JobRole`, `MaritalStatus`, `BusinessTravel`, `Department`, `EducationField`, `Gender`, `JobLevel`.
+- **Output:** Probability that the employee will leave (classification: 0/1).
+- **Primary metric:** **ROC-AUC** (goal: **≥ 0.75**).
+- **Decision support:** Risk band thresholds (default: Low < 0.35, Medium 0.35–0.59, High ≥ 0.60). These can be adjusted with stakeholders.
+- **Success:** Model reaches or beats the ROC-AUC goal, and insights are understandable enough to guide action (e.g., focus on overtime and low satisfaction groups).
 
 
 
