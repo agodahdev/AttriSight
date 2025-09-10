@@ -171,6 +171,15 @@ If data/processed/hr_attrition_ready.parquet exists: loads 200 rows, fits a tiny
 5: Test config
 pytest.ini limits tests to the tests/ folder
 
+## Error & Bug Fix Log (what went wrong and how we fixed it)
+
+Below are the common issues we hit during build, with quick fixes.
+
+### Kaggle
+
+#### Symptom: `CalledProcessError` when running `kaggle datasets download`
+* **Cause:** Missing Kaggle login or wrong path.
+* **Fix:** Confirm `~/.kaggle/kaggle.json` exists, re-run the install + download cells, use `-p ../data/raw --unzip`.
 
 
 ## How to use this repo
