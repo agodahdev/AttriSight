@@ -114,6 +114,42 @@ Technical page shows AUC and whether the goal is met.
 - Threshold sweep table (accuracy/precision/recall/F1)
 - Live CM slider
 
+## Manual Testing
+
+### A. App starts
+- **Run:** `streamlit run app.py`
+- **Expect:** App loads with 5 pages in the sidebar (Summary, Analysis, Hypotheses, ML, Technical).
+
+### B. Summary page
+- Shows a small table preview of the dataset.
+- Caption tells you which file was loaded (ready → processed → raw).
+- If no files exist, it shows a friendly message telling you to run Notebook 01–02.
+
+### C. Workforce Analysis (BR#1)
+- Filters work (dropdowns don't clash).
+- Charts render:
+  - Bars by category (e.g., OverTime).
+  - Box plot (e.g., Age vs Attrition).
+  - Correlation heatmap (numeric).
+- Each plot has a short caption explaining what to look for.
+
+### D. Hypotheses
+- H1 (OverTime) shows KPIs (rates + gap) and a clear callout.
+- H2 (JobSatisfaction) and H3 (Age group) show rates and charts.
+- If SciPy is installed: chi-square p-values are shown. If not, a friendly note appears.
+
+### E. ML Predictor (BR#2)
+- The form shows one input per feature (numbers → number input, categories → dropdowns).
+- Clicking Predict returns:
+  - Probability (e.g., 0.62 → 62%),
+  - Risk band (Low/Medium/High) with an icon.
+
+### F. Technical
+- Shows ROC-AUC and whether the goal (≥ 0.75) is met.
+- Shows saved ROC and Confusion Matrix images.
+- Shows threshold table (with F1 highlight) and live confusion matrix with a slider.
+- Shows pipeline steps and feature list.
+
 ## How to use this repo
 
 1. Use this template to create your GitHub project repo
