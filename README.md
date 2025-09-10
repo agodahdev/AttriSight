@@ -2,6 +2,14 @@
 
 A simple web app that helps HR **understand why people leave** and **predict who might leave next**.
 
+## 1) Overview & Goals
+
+- **Explain (BR#1):** Show clear charts (bars / box / heatmap) to see which factors relate to attrition.
+- **Predict (BR#2):** Enter an employee profile and get an **attrition probability** + **risk band** (Low/Medium/High).
+- **Audience:** HR / People Analytics / managers.
+
+
+
 
 ## How to use this repo
 
