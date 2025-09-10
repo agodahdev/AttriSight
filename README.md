@@ -216,6 +216,23 @@ Below are the common issues we hit during build, with quick fixes.
 * **Cause:** Inconsistent config during refactor.
 * **Fix:** Use a single `config.py` with `ROOT`, `RAW_CSV`, `PROCESSED_PARQUET`, `READY_PARQUET`, `ARTIFACTS/V1` paths.
 
+### Modeling & metrics
+
+#### Symptom: `AttributeError: 'float' object has no attribute 'round'`
+* **Cause:** Used `.round(3)` on a Python float.
+* **Fix:** Use `round(value, 3)` or f-strings like `f"{value:.3f}"`.
+
+#### Symptom: Grid search taking too long
+* **Cause:** Big parameter grid.
+* **Fix:** Two options:
+  * Keep **big grid** (Distinction-level) and accept the wait.
+  * Or use the **small grid** (faster) and mention it in README.
+
+#### Symptom: AUC or confusion matrix not showing live
+* **Cause:** Missing artifacts or data.
+* **Fix:** Run **NB03** (exports model) and **NB02** (creates ready parquet), then reload the Technical page.
+
+
 
 ## How to use this repo
 
