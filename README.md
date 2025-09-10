@@ -100,6 +100,20 @@ Grid search over ≥6 hyperparameters (each with ≥3 values) for Distinction:
 ### **Why these params**
 They control model complexity (depth/leaves/split), ensemble size (`n_estimators`), feature sampling (`max_features`), and split measure (`criterion`).
 
+## Model Performance
+
+### **Primary metric**
+ROC-AUC (goal ≥ 0.75).
+
+### **Where to see it**
+Technical page shows AUC and whether the goal is met.
+
+### **Also provided**
+- Saved ROC curve
+- Saved confusion matrix @0.50
+- Threshold sweep table (accuracy/precision/recall/F1)
+- Live CM slider
+
 ## How to use this repo
 
 1. Use this template to create your GitHub project repo
