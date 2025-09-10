@@ -150,6 +150,29 @@ Technical page shows AUC and whether the goal is met.
 - Shows threshold table (with F1 highlight) and live confusion matrix with a slider.
 - Shows pipeline steps and feature list.
 
+## How to run:
+
+"pytest -q"
+
+- What's included:
+
+1 - tests/test_smoke.py:
+- Checks pytest runs at all (simple smoke test).
+
+2 - tests/test_pages_import.py:
+Imports each Streamlit page module to catch syntax/import errors early.
+
+3 - tests/test_utils.py:
+Tests the small helper that converts Yes/No → 1/0.
+
+4 - tests/test_pipeline_fit_predict.py:
+If data/processed/hr_attrition_ready.parquet exists: loads 200 rows, fits a tiny Logistic Regression pipeline, and checks it predicts 0/1 without error. (Skips automatically if the ready file isn't there yet.)
+
+5: Test config
+pytest.ini limits tests to the tests/ folder
+
+
+
 ## How to use this repo
 
 1. Use this template to create your GitHub project repo
