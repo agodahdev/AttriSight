@@ -119,6 +119,18 @@ Technical page shows AUC and whether the goal is met.
 * Images and tables for the app live under `assets/`.
 * This keeps releases tidy and reproducible.
 
+## Limitations & Next Steps
+
+### **Limitations:**
+* Dataset is small and generic; may not reflect your company.
+* Features are limited; no text or time-series data.
+
+### **Next:**
+* Align thresholds with HR stakeholders (costs of FP/FN).
+* Try other models (XGBoost, calibrated probabilities).
+* Add monitoring (drift, weekly AUC).
+* Add feature importance/explanations in the app.
+
 ## Manual Testing
 
 ### A. App starts
