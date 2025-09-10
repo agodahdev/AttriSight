@@ -18,6 +18,22 @@ A simple web app that helps HR **understand why people leave** and **predict who
 - **Decision support:** Risk band thresholds (default: Low < 0.35, Medium 0.35–0.59, High ≥ 0.60). These can be adjusted with stakeholders.
 - **Success:** Model reaches or beats the ROC-AUC goal, and insights are understandable enough to guide action (e.g., focus on overtime and low satisfaction groups).
 
+## 6) Reproduce the Project (Notebooks)
+
+Run in order:
+
+1. **01_data_collection.ipynb**
+   - Pull from Kaggle into `data/raw/` and save `data/processed/hr_attrition.parquet`.
+
+2. **02_clean_target.ipynb**
+   - Create `target` (Yes→1 / No→0), quick EDA, save `data/processed/hr_attrition_ready.parquet`.
+
+3. **03_train_tune_export.ipynb**
+   - Train baseline (LogReg, RF), **grid search RF**, show train+test metrics, export model & features to `artifacts/v1/`.
+
+4. **04_evaluate_and_release.ipynb**
+   - Save **ROC** and **Confusion Matrix** images + **threshold_metrics.csv** to `assets/`.
+
 
 ## Data Source
 
