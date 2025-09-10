@@ -232,6 +232,11 @@ Below are the common issues we hit during build, with quick fixes.
 * **Cause:** Missing artifacts or data.
 * **Fix:** Run **NB03** (exports model) and **NB02** (creates ready parquet), then reload the Technical page.
 
+### Testing hiccups
+
+#### Symptom: Pipeline test skipped
+* **Cause:** Ready parquet not created yet.
+* **Fix:** Run **NB02** to create `hr_attrition_ready.parquet`.
 
 
 ## How to use this repo
