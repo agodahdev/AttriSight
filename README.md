@@ -49,6 +49,24 @@ Run in order:
 - **H3:** ≤30 yrs → higher attrition.
 - (Optional) Chi-square p-values if SciPy installed.
 
+### **Attrition Predictor (BR#2)**
+- Form with one input per feature → probability + risk band.
+
+### **Technical**
+- **ROC-AUC** vs goal line, saved **ROC** and **CM**, threshold table with F1 highlight, live CM slider, and pipeline steps.
+
+## Map Business Requirements → Tasks
+
+### **BR#1 (Explain)**
+- **User story:** "As HR, I want clear charts so I can see which factors relate to attrition."
+- **Tasks:** grouped bar charts, box plot, correlation heatmap, short captions.
+- **Pages:** Workforce Analysis, Hypotheses.
+
+### **BR#2 (Predict)**
+- **User story:** "As HR, I want to enter a profile and see the attrition probability."
+- **Tasks:** build preprocessing + model pipeline, Train/Tune, export, Streamlit form for inputs, risk band.
+- **Pages:** Attrition Predictor (ML), Technical.
+
 
 
 ## How to use this repo
