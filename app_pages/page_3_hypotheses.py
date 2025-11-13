@@ -10,8 +10,15 @@ def _load_df():
         if p.exists():
             return pd.read_parquet(p)
     return None
+def run():
+    st.title("Project Hypotheses & Validation")
+    st.markdown("""
+    **H1:** Overtime workers leave more.  
+    **H2:** Lower job satisfaction increases attrition.  
+    **H3:** Younger employees (≤30) leave more often.
+    """)
 
-# Use the helper function defined above
+    # Use the helper function defined above
     df = _load_df()
 
     if df is None:
