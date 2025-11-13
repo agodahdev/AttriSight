@@ -67,20 +67,6 @@ Run in order:
 
 - **ROC-AUC** vs goal line, saved **ROC** and **CM**, threshold table with F1 highlight, live CM slider, and pipeline steps.
 
-## Map Business Requirements → Tasks
-
-### **BR#1 (Explain)**
-
-- **User story:** "As HR, I want clear charts so I can see which factors relate to attrition."
-- **Tasks:** grouped bar charts, box plot, correlation heatmap, short captions.
-- **Pages:** Workforce Analysis, Hypotheses.
-
-### **BR#2 (Predict)**
-
-- **User story:** "As HR, I want to enter a profile and see the attrition probability."
-- **Tasks:** build preprocessing + model pipeline, Train/Tune, export, Streamlit form for inputs, risk band.
-- **Pages:** Attrition Predictor (ML), Technical.
-
 ## How to Use the Attrition Predictor
 
 The **Attrition Predictor (ML)** page allows you to predict whether an employee is at risk of leaving by entering their profile information.
@@ -148,9 +134,27 @@ workload review, or compensation adjustment.
 - **Regular Monitoring**: Re-run predictions quarterly or after major organizational changes
 - **Combine with Insights**: Use the **Workforce Analysis** page to understand which factors matter most
 
+### **Privacy Note:**
+
+Employee profile data entered in this tool is not stored. Predictions are generated in real-time and are not saved to any database.
+
+## Map Business Requirements → Tasks
+
+### **BR#1 (Explain)**
+
+- **User story:** "As HR, I want clear charts so I can see which factors relate to attrition."
+- **Tasks:** grouped bar charts, box plot, correlation heatmap, short captions.
+- **Pages:** Workforce Analysis, Hypotheses.
+
+### **BR#2 (Predict)**
+
+- **User story:** "As HR, I want to enter a profile and see the attrition probability."
+- **Tasks:** build preprocessing + model pipeline, Train/Tune, export, Streamlit form for inputs, risk band.
+- **Pages:** Attrition Predictor (ML), Technical.
+
 ## Hypothesis Validation Results
 
-### **H1: OverTime workers leave more - SUPPORTED **
+### **H1: OverTime workers leave more - SUPPORTED ✅**
 
 **Evidence:**
 
@@ -165,7 +169,7 @@ workload review, or compensation adjustment.
 
 ---
 
-### **H2: Lower JobSatisfaction increases attrition - SUPPORTED **
+### **H2: Lower JobSatisfaction increases attrition - SUPPORTED ✅**
 
 **Evidence:**
 
@@ -180,7 +184,7 @@ workload review, or compensation adjustment.
 
 ---
 
-### **H3: Younger employees (≤30) leave more often - SUPPORTED **
+### **H3: Younger employees (≤30) leave more often - SUPPORTED ✅**
 
 **Evidence:**
 
@@ -320,27 +324,36 @@ Technical page shows AUC and whether the goal is met.
 - Shows threshold table (with F1 highlight) and live confusion matrix with a slider.
 - Shows pipeline steps and feature list.
 
-## How to run:
+### How to Run Tests
 
-"pytest -q"
+Run the test suite with:
 
-- What's included:
+```bash
+pytest -q
+```
 
-1 - tests/test_smoke.py:
+### **What's Included:**
 
-- Checks pytest runs at all (simple smoke test).
+**1. tests/test_smoke.py**
 
-2 - tests/test_pages_import.py:
-Imports each Streamlit page module to catch syntax/import errors early.
+- Checks pytest runs at all (simple smoke test)
 
-3 - tests/test_utils.py:
-Tests the small helper that converts Yes/No → 1/0.
+**2. tests/test_pages_import.py**
 
-4 - tests/test_pipeline_fit_predict.py:
-If data/processed/hr_attrition_ready.parquet exists: loads 200 rows, fits a tiny Logistic Regression pipeline, and checks it predicts 0/1 without error. (Skips automatically if the ready file isn't there yet.)
+- Imports each Streamlit page module to catch syntax/import errors early
 
-5: Test config
-pytest.ini limits tests to the tests/ folder
+**3. tests/test_utils.py**
+
+- Tests the small helper that converts Yes/No → 1/0
+
+**4. tests/test_pipeline_fit_predict.py**
+
+- Loads 200 rows, fits a tiny Logistic Regression pipeline, checks it predicts 0/1 without error
+- Skips automatically if the ready file isn't there yet
+
+**5. Test Configuration**
+
+- pytest.ini limits tests to the tests/ folder
 
 ## Error & Bug Fix Log (what went wrong and how we fixed it)
 
@@ -373,7 +386,7 @@ Below are the common issues we hit during build, with quick fixes.
 #### Symptom: `ARTIFACTS_DIR` or `DATA_READY` not defined
 
 - **Cause:** Inconsistent config during refactor.
-- **Fix:** Use a single `config.py` with `ROOT`, `RAW_CSV`, `PROCESSED_PARQUET`, `READY_PARQUET`, `ARTIFACTS/V1` paths.
+- **Fix:** Use a single `config.py` with `ROOT`, `RAW_CSV`, `PROCESSED_PARQUET`, `READY_PARQUET`, `ARTIFACTS_DIR` paths.
 
 ### Modeling & metrics
 
