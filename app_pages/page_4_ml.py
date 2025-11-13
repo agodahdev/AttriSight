@@ -55,6 +55,12 @@ def _band(prob: float):
 def run():
     st.title("Attrition Predictor (ML)")
     # 1) Load model + feature names
+    st.markdown("### Business Requirement #2: Predict Employee Attrition")
+    st.info("""
+    **Purpose:** This page allows HR to enter an employee profile and receive a prediction 
+    of their attrition risk. This directly addresses **BR#2** - providing ML-based predictions 
+    for proactive retention planning.
+    """)
     try:
         pipe, feats = _load_artifacts()
     except Exception as e:
