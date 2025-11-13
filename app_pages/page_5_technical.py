@@ -101,13 +101,13 @@ def run():
     with c1:
         st.subheader("ROC Curve (saved)")
         if ROC_PATH.exists():
-            st.image(str(ROC_PATH), use_container_width=True)
+            st.image(str(ROC_PATH), use_column_width=True)
         else:
             st.info(f"Missing: {ROC_PATH.relative_to(ROOT)}. Run Notebook 04 to create it.")
     with c2:
         st.subheader("Confusion Matrix @ 0.50")
         if CM_PATH.exists():
-            st.image(str(CM_PATH), use_container_width=True)
+            st.image(str(CM_PATH), use_column_width=True)
         else:
             st.info(f"Missing: {CM_PATH.relative_to(ROOT)}. Run Notebook 04 to generate it.")
 
