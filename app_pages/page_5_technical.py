@@ -73,10 +73,23 @@ def run():
 
         target_auc = 0.75
         st.markdown(f"**Performance goal:** ROC-AUC ≥ {target_auc:.2f}")
+        
+        # Clear objective statement on model success
+        st.markdown("---")
+        st.subheader("Model Performance Evaluation")
         if auc >= target_auc:
-            st.success("Goal met ✅")
+            st.success(f"✅ **MODEL SUCCESS**: The model achieves ROC-AUC of {auc:.3f}, which **MEETS** the business requirement of ≥ {target_auc:.2f}")
+            st.markdown("""
+            **Conclusion:** The Random Forest classification model successfully meets the performance criteria 
+            and is suitable for deployment to predict employee attrition risk.
+            """)
         else:
-            st.warning("Goal not met ⚠️ — consider more tuning")
+            st.error(f"❌ **MODEL FAILURE**: The model achieves ROC-AUC of {auc:.3f}, which **DOES NOT MEET** the business requirement of ≥ {target_auc:.2f}")
+            st.markdown("""
+            **Conclusion:** The model requires further tuning or a different modeling approach before deployment. 
+            Consider: more hyperparameter optimization, feature engineering, or alternative algorithms.
+            """)
+        st.markdown("---")
     except Exception as e:
         st.warning(f"Could not compute AUC: {e}")
         y_true, y_prob, auc = None, None, None
