@@ -1,34 +1,19 @@
 import streamlit as st
 import pandas as pd
-from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
-READY = ROOT / "data/processed/hr_attrition_ready.parquet"
-PROCESSED = ROOT / "data/processed/hr_attrition.parquet"
+# Import from src modules for consistency
+from src.config import READY_PARQUET, PROCESSED_PARQUET
 
 def _load_df():
-    """Load the processed dataset from an absolute path."""
-    for p in (READY, PROCESSED):
+    """Load the processed dataset using paths from config."""
+    for p in (READY_PARQUET, PROCESSED_PARQUET):
         if p.exists():
             return pd.read_parquet(p)
     return None
 
-def run():
-    st.title("Project Hypotheses & Validation")
-    st.markdown("""
-    **H1:** Overtime workers leave more.  
-    **H2:** Lower job satisfaction increases attrition.  
-    **H3:** Younger employees (≤30) leave more often.
-    """)
+# Use the helper function defined above
+    df = _load_df()
 
-    path_opts = ["data/processed/hr_attrition_ready.parquet", "data/processed/hr_attrition.parquet"]
-    df = None
-    for p in path_opts:
-        try:
-            df = pd.read_parquet(p)
-            break
-        except Exception:
-            continue
     if df is None:
         st.warning("Processed data not found. Run Notebook 02.")
         return
