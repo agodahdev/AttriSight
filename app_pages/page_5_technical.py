@@ -143,6 +143,93 @@ def run():
     
     st.divider()
 
+    # Classification Report
+    st.subheader("Classification Report (threshold = 0.50)")
+    if (y_true is not None) and (y_prob is not None):
+        from sklearn.metrics import classification_report
+        
+        y_pred_50 = (y_prob >= 0.50).astype(int)
+        report_dict = classification_report(y_true, y_pred_50, output_dict=True)
+        
+        # Convert to DataFrame for better display
+        report_df = pd.DataFrame(report_dict).transpose()
+        
+        st.dataframe(
+            report_df.style.format("{:.3f}").background_gradient(cmap="RdYlGn", subset=["f1-score"]),
+            use_container_width=True
+        )
+        
+        st.caption("""
+        **Interpretation:** 
+        - **Precision**: Of employees predicted to leave, what % actually left
+        - **Recall**: Of employees who actually left, what % did we correctly identify
+        - **F1-score**: Harmonic mean of precision and recall (balanced metric)
+        - Focus on class '1' (Leave) metrics for business decisions
+        """)
+    else:
+        st.info("Classification report unavailable - check that data and model loaded correctly")
+
+    st.divider()
+
+    # Actual vs Predicted Comparison
+    st.subheader("Actual vs Predicted (threshold = 0.50)")
+    if (y_true is not None) and (y_prob is not None):
+        y_pred_50 = (y_prob >= 0.50).astype(int)
+        
+        # Create comparison DataFrame
+        comparison_df = pd.DataFrame({
+            'Actual': y_true,
+            'Predicted': y_pred_50,
+            'Probability': y_prob
+        })
+        
+        # Determine prediction correctness
+        comparison_df['Correct'] = comparison_df['Actual'] == comparison_df['Predicted']
+        
+        # Create scatter plot
+        fig, ax = plt.subplots(figsize=(10, 6))
+        
+        # Plot correct predictions
+        correct = comparison_df[comparison_df['Correct']]
+        ax.scatter(correct['Actual'], correct['Predicted'], 
+                  alpha=0.6, c='green', label=f'Correct ({len(correct)})', s=50)
+        
+        # Plot incorrect predictions
+        incorrect = comparison_df[~comparison_df['Correct']]
+        ax.scatter(incorrect['Actual'], incorrect['Predicted'], 
+                  alpha=0.6, c='red', label=f'Incorrect ({len(incorrect)})', marker='x', s=50)
+        
+        ax.set_xlabel('Actual Class (0=Stay, 1=Leave)', fontsize=12)
+        ax.set_ylabel('Predicted Class (0=Stay, 1=Leave)', fontsize=12)
+        ax.set_title('Actual vs Predicted Classification', fontsize=14)
+        ax.set_xticks([0, 1])
+        ax.set_yticks([0, 1])
+        ax.legend()
+        ax.grid(True, alpha=0.3)
+        
+        st.pyplot(fig, use_container_width=True)
+        
+        # Show accuracy breakdown
+        accuracy = (comparison_df['Correct'].sum() / len(comparison_df)) * 100
+        st.markdown(f"""
+        **Prediction Accuracy:** {accuracy:.1f}%  
+        - ✅ Correct predictions: {len(correct):,} ({len(correct)/len(comparison_df)*100:.1f}%)
+        - ❌ Incorrect predictions: {len(incorrect):,} ({len(incorrect)/len(comparison_df)*100:.1f}%)
+        
+        **Note:** Green dots show correct predictions, red X marks show misclassifications.
+        """)
+        
+        # Show sample of misclassified cases
+        if len(incorrect) > 0:
+            with st.expander("View sample of misclassified cases"):
+                st.dataframe(
+                    incorrect.head(10).style.format({'Probability': '{:.3f}'}),
+                    use_container_width=True
+                )
+                st.caption("These cases were predicted incorrectly. Review patterns to understand model limitations.")
+    else:
+        st.info("Actual vs Predicted plot unavailable - check that data and model loaded correctly")
+
     # Pipeline details 
     st.subheader("Pipeline details")
     st.markdown("**Steps (in order):**")
