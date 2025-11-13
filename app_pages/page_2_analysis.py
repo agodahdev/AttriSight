@@ -1,25 +1,19 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-from src.config import DATA_PROCESSED
 from pathlib import Path
 
+# Import from src modules for consistency
+from src.config import ROOT, READY_PARQUET, PROCESSED_PARQUET, RAW_CSV
+from src.features import NUM_FEATURES, CAT_FEATURES
 
- 
-ROOT = Path(__file__).resolve().parents[1]
-READY = ROOT / "data/processed/hr_attrition_ready.parquet"
-PROCESSED = ROOT / "data/processed/hr_attrition.parquet"
-RAW_CSV = ROOT / "data/raw/WA_Fn-UseC_-HR-Employee-Attrition.csv"
+# Use paths from config
+READY = READY_PARQUET
+PROCESSED = PROCESSED_PARQUET
 
-# Feature suggestions
-SUGGESTED_CAT = [
-    "OverTime", "JobRole", "MaritalStatus", "BusinessTravel",
-    "Department", "EducationField", "Gender", "JobLevel"
-]
-SUGGESTED_NUM = [
-    "Age", "MonthlyIncome", "DistanceFromHome", "TotalWorkingYears",
-    "YearsAtCompany", "NumCompaniesWorked", "PercentSalaryHike"
-]
+# Use features from src.features
+SUGGESTED_CAT = CAT_FEATURES
+SUGGESTED_NUM = NUM_FEATURES
 
 def _load_df():
     """Load dataset from preferred locations; return (DataFrame, path) or (None, None)."""
