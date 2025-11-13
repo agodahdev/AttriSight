@@ -13,6 +13,10 @@ A simple web app that helps HR **understand why people leave** and **predict who
 - **Problem:** Reduce employee attrition by identifying risk early.
 - **Users:** HR analysts and managers.
 - **Inputs (features):** e.g., `Age`, `MonthlyIncome`, `DistanceFromHome`, `TotalWorkingYears`, `YearsAtCompany`, `NumCompaniesWorked`, `PercentSalaryHike`, plus categorical fields such as `OverTime`, `JobRole`, `MaritalStatus`, `BusinessTravel`, `Department`, `EducationField`, `Gender`, `JobLevel`.
+- **Dataset:** 1,470 employee records from IBM HR Analytics
+  - **Training set:** 1,176 samples (80%)
+  - **Test set:** 294 samples (20%)
+  - **Split strategy:** Stratified by target to maintain class balance (~16% attrition rate in both sets)
 - **Output:** Probability that the employee will leave (classification: 0/1).
 - **Primary metric:** **ROC-AUC** (goal: **≥ 0.75**).
 - **Decision support:** Risk band thresholds (default: Low < 0.35, Medium 0.35–0.59, High ≥ 0.60). These can be adjusted with stakeholders.
@@ -77,24 +81,72 @@ Run in order:
 - **Tasks:** build preprocessing + model pipeline, Train/Tune, export, Streamlit form for inputs, risk band.
 - **Pages:** Attrition Predictor (ML), Technical.
 
-## Hypotheses & Validation
+## How to Use the Attrition Predictor
 
-### **H1**
+The **Attrition Predictor (ML)** page allows you to predict whether an employee is at risk of leaving by entering their profile information.
 
-- **Hypothesis:** OverTime=Yes shows higher attrition.
-- **Evidence:** higher rate in table/plot; positive gap KPI; (optional) chi-square p < 0.05.
+### **Step-by-Step Guide:**
 
-### **H2**
+1. **Navigate to the Predictor**
 
-- **Hypothesis:** Lower JobSatisfaction relates to higher attrition.
-- **Evidence:** rising rates at low satisfaction levels; (optional) chi-square p < 0.05.
+   - Open the dashboard
+   - Click **"Attrition Predictor (ML)"** in the sidebar
 
-### **H3**
+2. **Enter Employee Information**
+   The form has inputs for 15 features across two columns:
 
-- **Hypothesis:** Younger group (≤30) shows higher attrition.
-- **Evidence:** higher rate for ≤30 group; (optional) chi-square p < 0.05.
+   **Numeric Fields** (use number inputs):
 
-_(Exact p-values appear on the Hypotheses page if SciPy is installed.)_
+   - **Age**: Employee's age in years (e.g., 35)
+   - **MonthlyIncome**: Monthly salary in currency units (e.g., 5000)
+   - **DistanceFromHome**: Distance from home to work in miles/km (e.g., 10)
+   - **TotalWorkingYears**: Total years of professional experience (e.g., 12)
+   - **YearsAtCompany**: Years worked at current company (e.g., 5)
+   - **NumCompaniesWorked**: Number of previous employers (e.g., 3)
+   - **PercentSalaryHike**: Last salary increase percentage (e.g., 15)
+
+   **Categorical Fields** (use dropdowns):
+
+   - **OverTime**: Does the employee work overtime? (Yes/No)
+   - **JobRole**: Current position (e.g., Sales Executive, Research Scientist)
+   - **MaritalStatus**: Marital status (Single/Married/Divorced)
+   - **BusinessTravel**: Travel frequency (Non-Travel/Travel_Rarely/Travel_Frequently)
+   - **Department**: Working department (Sales/Research & Development/Human Resources)
+   - **EducationField**: Field of education (e.g., Life Sciences, Medical, Technical Degree)
+   - **Gender**: Employee gender (Male/Female)
+   - **JobLevel**: Job level ranking (1-5, where 5 is highest)
+
+3. **Get Prediction**
+   - Click the **"Predict"** button at the bottom of the form
+   - The system will display:
+     - **Attrition Probability**: Percentage likelihood of leaving (e.g., 45.2%)
+     - **Risk Band**: Classification into Low/Medium/High risk with visual indicator
+
+### **Understanding the Results:**
+
+**Risk Bands:**
+
+- 🟢 **Low Risk** (< 35%): Employee unlikely to leave - maintain current engagement
+- 🟡 **Medium Risk** (35-59%): Monitor closely - consider retention interventions
+- 🔴 **High Risk** (≥ 60%): Immediate action needed - schedule retention discussion
+
+**Example Interpretation:**
+
+```
+Attrition Probability: 62.5%
+Risk Band: 🔴 High
+
+Action: This employee shows strong indicators of leaving.
+Consider: one-on-one meeting, career development discussion,
+workload review, or compensation adjustment.
+```
+
+### **Tips for Best Results:**
+
+- **Accurate Data**: Ensure all employee information is current and correct
+- **Multiple Scenarios**: Try adjusting factors (e.g., reduce OverTime, increase salary) to see impact on risk
+- **Regular Monitoring**: Re-run predictions quarterly or after major organizational changes
+- **Combine with Insights**: Use the **Workforce Analysis** page to understand which factors matter most
 
 ## Hypothesis Validation Results
 
@@ -156,9 +208,28 @@ Binary classification using **Random Forest** with a clean **ColumnTransformer**
 - **Numeric:** impute median + scale
 - **Categorical:** impute most_frequent + one-hot (ignore unknowns)
 
-### **Baselines**
+### **Algorithms Evaluated**
 
-Compared Logistic Regression vs Random Forest.
+We compared two classification algorithms to establish a strong baseline before hyperparameter tuning:
+
+1. **Logistic Regression** (Baseline)
+
+   - **Type:** Linear model with L2 regularization (max_iter=1000)
+   - **ROC-AUC on test set:** ~0.76-0.78 (typical range)
+   - **Strengths:** Fast training, interpretable coefficients, good baseline
+   - **Limitations:** Assumes linear relationships between features and log-odds
+
+2. **Random Forest** (Final Model - Selected)
+   - **Type:** Ensemble of decision trees
+   - **ROC-AUC on test set:** ~0.82-0.85 (after tuning)
+   - **Why chosen:**
+     - Better handles non-linear relationships
+     - Captures complex feature interactions (e.g., Age × OverTime)
+     - More robust to outliers
+     - Provides feature importance rankings
+   - **Trade-off:** Longer training time, less interpretable than LogReg
+
+**Decision:** Random Forest selected as final model due to superior ROC-AUC performance and ability to capture complex patterns in employee behavior.
 
 ### **Tuning**
 
