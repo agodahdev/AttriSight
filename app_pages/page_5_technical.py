@@ -241,5 +241,5 @@ def run():
             st.code("\n".join(map(str, feats)), language="text")
 
     st.caption("Preprocessing: numeric = impute(median) + scale; "
-     "categorical = impute(mostt_frequent) + one-hot (ignore unknowns)."
+     "categorical = impute(most_frequent) + one-hot (ignore unknowns)."
     )
