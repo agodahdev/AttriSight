@@ -1,4 +1,4 @@
-core.Microsoft*
+gitignorecore.Microsoft*
 core.mongo*
 core.python*
 env.py
@@ -17,6 +17,3 @@ kaggle.json
 !jupyter_notebooks/03_train_tune_export.ipynb
 !jupyter_notebooks/04_evaluate_and_release.ipynb
 .env
-data/processed/*
-artifacts/*
-versions/*
