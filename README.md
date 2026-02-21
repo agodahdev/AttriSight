@@ -1,444 +1,369 @@
 # AttriSight — HR Attrition Analytics & Predictor
 
-A simple web app that helps HR **understand why people leave** and **predict who might leave next**.
+A web app that helps HR **understand why people leave** and **predict who might leave next**.
 
 ## Overview & Goals
 
-- **Explain (BR#1):** Show clear charts (bars / box / heatmap) to see which factors relate to attrition.
-- **Predict (BR#2):** Enter an employee profile and get an **attrition probability** + **risk band** (Low/Medium/High).
-- **Audience:** HR / People Analytics / managers.
+- **Explain (BR#1):** Show clear charts (bars, box plots, heatmap, interactive sunburst) so HR can see which factors relate to attrition.
+- **Predict (BR#2):** Enter an employee profile and get an attrition probability plus a risk band (Low / Medium / High).
+- **Audience:** HR, People Analytics, and managers.
 
-## Business Case (in ML terms)
+## Business Case (in ML Terms)
 
 - **Problem:** Reduce employee attrition by identifying risk early.
 - **Users:** HR analysts and managers.
-- **Inputs (features):** e.g., `Age`, `MonthlyIncome`, `DistanceFromHome`, `TotalWorkingYears`, `YearsAtCompany`, `NumCompaniesWorked`, `PercentSalaryHike`, plus categorical fields such as `OverTime`, `JobRole`, `MaritalStatus`, `BusinessTravel`, `Department`, `EducationField`, `Gender`, `JobLevel`.
-- **Dataset:** 1,470 employee records from IBM HR Analytics
-  - **Training set:** 1,176 samples (80%)
-  - **Test set:** 294 samples (20%)
-  - **Split strategy:** Stratified by target to maintain class balance (~16% attrition rate in both sets)
-- **Output:** Probability that the employee will leave (classification: 0/1).
-- **Primary metric:** **ROC-AUC** (goal: **≥ 0.75**).
-- **Decision support:** Risk band thresholds (default: Low < 0.35, Medium 0.35–0.59, High ≥ 0.60). These can be adjusted with stakeholders.
-- **Success:** Model reaches or beats the ROC-AUC goal, and insights are understandable enough to guide action (e.g., focus on overtime and low satisfaction groups).
+- **Dataset:** IBM HR Analytics — 1,470 employee records from Kaggle.
+- **Features:** 7 numeric and 8 categorical (15 total), listed below.
+- **Target:** Attrition (Yes / No mapped to 1 / 0).
+- **Primary metric:** ROC-AUC (goal: ≥ 0.75).
+- **Output:** Probability that the employee will leave (binary classification: 0 / 1).
+
+### Dataset & Train/Test Split
+
+| Detail         | Value                                                                |
+| -------------- | -------------------------------------------------------------------- |
+| Total samples  | 1,470                                                                |
+| Training set   | 1,176 (80%)                                                          |
+| Test set       | 294 (20%)                                                            |
+| Split strategy | Stratified by target to maintain ~16% attrition rate in both sets    |
+| Validation     | 5-fold cross-validation during grid search (no separate holdout set) |
+
+### Features Used
+
+**Numeric (7):** Age, MonthlyIncome, DistanceFromHome, TotalWorkingYears, YearsAtCompany, NumCompaniesWorked, PercentSalaryHike
+
+**Categorical (8):** OverTime, JobRole, MaritalStatus, BusinessTravel, Department, EducationField, Gender, JobLevel
+
+### Decision Support
+
+Risk band thresholds (default values, adjustable with stakeholders):
+
+- **Low** — probability below 0.35
+- **Medium** — probability 0.35 to 0.59
+- **High** — probability 0.60 and above
+
+### Success Criteria
+
+The model reaches or beats the ROC-AUC goal of 0.75, and insights are understandable enough to guide action (for example, focus on overtime and low-satisfaction groups).
+
+## Map Business Requirements to Tasks
+
+### BR#1 (Explain)
+
+- **User story:** "As HR, I want clear charts so I can see which factors relate to attrition."
+- **Tasks:** Grouped bar charts, box plots, correlation heatmap, interactive sunburst, attrition rate by category, short captions under each plot.
+- **Pages:** Workforce Analysis, Project Hypotheses.
+
+### BR#2 (Predict)
+
+- **User story:** "As HR, I want to enter a profile and see the attrition probability."
+- **Tasks:** Build preprocessing and model pipeline, train and tune, export artifacts, Streamlit form for inputs, risk band output.
+- **Pages:** Attrition Predictor (ML), Technical: Model & Evaluation.
+
+## Hypothesis Validation Results
+
+### H1: Overtime Workers Leave More — SUPPORTED
+
+- Attrition rate for OverTime = Yes: approximately 30%
+- Attrition rate for OverTime = No: approximately 10%
+- Gap: roughly 20 percentage points higher attrition for overtime workers
+- Chi-square test: p < 0.001 (statistically significant)
+
+**Conclusion:** There is strong statistical evidence that employees working overtime have significantly higher attrition rates. **Recommended action:** Review overtime policies and workload distribution.
+
+### H2: Lower Job Satisfaction Increases Attrition — SUPPORTED
+
+- JobSatisfaction level 1 (lowest): approximately 23% attrition rate
+- JobSatisfaction level 4 (highest): approximately 11% attrition rate
+- Pattern: Progressive decrease in attrition as satisfaction increases
+- Chi-square test: p < 0.001 (statistically significant)
+
+**Conclusion:** There is a clear inverse relationship between job satisfaction and attrition. **Recommended action:** Implement regular satisfaction surveys and develop targeted retention programmes for low-satisfaction teams.
+
+### H3: Younger Employees (age 30 or under) Leave More Often — SUPPORTED
+
+- Age 30 or under: approximately 25% attrition rate
+- Age over 30: approximately 13% attrition rate
+- Gap: roughly 12 percentage points higher attrition for younger employees
+- Chi-square test: p < 0.001 (statistically significant)
+
+**Conclusion:** Younger employees demonstrate significantly higher attrition rates. **Recommended action:** Develop early-career retention programmes including mentorship, clear career progression paths, and competitive compensation reviews.
+
+### Statistical Validation Summary
+
+All three hypotheses achieved statistical significance (p < 0.05) using chi-square tests of independence. The observed differences in attrition rates are very unlikely to be caused by random chance. The business should prioritise interventions addressing overtime practices, job satisfaction, and early-career retention.
+
+## Modelling Summary
+
+### Algorithms Evaluated
+
+Two classification algorithms were compared to establish a strong baseline before hyperparameter tuning:
+
+**1. Logistic Regression (Baseline)**
+
+- Type: Linear model with L2 regularisation (max_iter=1000)
+- ROC-AUC on test set: approximately 0.76 to 0.78
+- Strengths: Fast training, interpretable coefficients, good baseline
+- Limitations: Assumes linear relationships between features and log-odds
+
+**2. Random Forest (Final Model — Selected)**
+
+- Type: Ensemble of decision trees
+- ROC-AUC on test set: approximately 0.82 to 0.85 (after tuning)
+- Strengths: Handles non-linear relationships, captures feature interactions, robust to outliers, provides feature importance rankings
+- Trade-off: Longer training time, less interpretable than Logistic Regression
+
+**Decision:** Random Forest was selected as the final model due to superior ROC-AUC performance and ability to capture complex patterns in employee behaviour.
+
+### Pipeline Architecture
+
+Binary classification using Random Forest with a ColumnTransformer:
+
+- Numeric preprocessing: impute with median, then standard scale
+- Categorical preprocessing: impute with most frequent, then one-hot encode (ignore unknowns)
+
+### Hyperparameter Tuning
+
+Grid search over 6 hyperparameters (each with 3 or more values), optimising ROC-AUC with 5-fold cross-validation:
+
+- `n_estimators` — number of trees in the forest
+- `max_depth` — maximum depth of each tree
+- `min_samples_split` — minimum samples required to split a node
+- `min_samples_leaf` — minimum samples required at a leaf node
+- `max_features` — number of features to consider for the best split
+- `criterion` — function to measure the quality of a split
+
+These parameters control model complexity (depth, leaves, split thresholds), ensemble size, feature sampling, and split measure.
+
+## Model Performance
+
+### Primary Metric
+
+ROC-AUC with a goal of 0.75 or above.
+
+### Where to See It
+
+The Technical: Model & Evaluation page in the dashboard shows the AUC value and a clear pass/fail verdict against the goal.
+
+### Evaluation Outputs
+
+- ROC curve (saved image)
+- Confusion matrix at threshold 0.50 (saved image)
+- Classification report with precision, recall, and F1 for each class
+- Actual vs predicted comparison plot
+- Threshold sweep table (accuracy, precision, recall, F1 at multiple thresholds)
+- Live interactive confusion matrix with a threshold slider
+
+## Dashboard Design (Pages & Content)
+
+### Project Summary
+
+Project goal, client requirements, dataset preview, train/test split details, and navigation guide.
+
+### Workforce Analysis (BR#1)
+
+Filters (Department, OverTime, Age range), grouped bar charts, box plots, attrition rate by category with colour coding, interactive sunburst chart (click to drill down by Department, JobRole, OverTime), and correlation heatmap.
+
+### Project Hypotheses
+
+H1 (OverTime), H2 (JobSatisfaction), and H3 (Age group), each with: hypothesis statement, evidence table with rates, bar chart, explicit SUPPORTED/NOT SUPPORTED verdict with specific percentages, chi-square p-values, and a summary of findings with recommended actions.
+
+### Attrition Predictor (BR#2)
+
+Form with one input per feature (numeric inputs and categorical dropdowns). Returns attrition probability and risk band (Low, Medium, High).
+
+### Technical: Model & Evaluation
+
+ROC-AUC value with pass/fail verdict against the 0.75 goal, results metrics cards (accuracy, precision, recall, F1), classification report table, actual vs predicted plot, saved ROC and confusion matrix images, threshold metrics table with F1 highlight, live interactive confusion matrix with slider, and pipeline step details.
+
+## How to Use the Attrition Predictor
+
+### Step-by-Step Guide
+
+1. Open the dashboard and click **Attrition Predictor (ML)** in the sidebar.
+2. Enter employee information in the form. Numeric fields use number inputs; categorical fields use dropdowns showing values from the dataset.
+3. Click **Predict** to see the attrition probability and risk band.
+
+### Input Fields
+
+**Numeric fields:** Age, MonthlyIncome, DistanceFromHome, TotalWorkingYears, YearsAtCompany, NumCompaniesWorked, PercentSalaryHike
+
+**Categorical fields:** OverTime (Yes/No), JobRole, MaritalStatus (Single/Married/Divorced), BusinessTravel (Non-Travel/Travel_Rarely/Travel_Frequently), Department, EducationField, Gender (Male/Female), JobLevel (1-5)
+
+### Understanding the Results
+
+- **Low Risk** (below 35%) — Employee unlikely to leave. Maintain current engagement.
+- **Medium Risk** (35% to 59%) — Monitor closely. Consider retention interventions.
+- **High Risk** (60% and above) — Immediate action needed. Schedule a retention discussion.
+
+### Tips for Best Results
+
+- Ensure all employee information is current and correct.
+- Try adjusting factors (for example, reduce OverTime or increase salary) to see the impact on risk.
+- Re-run predictions quarterly or after major organisational changes.
+- Use the Workforce Analysis page alongside the predictor to understand which factors matter most.
+
+### Privacy Note
+
+Employee profile data entered in this tool is not stored. Predictions are generated in real time and are not saved to any database.
 
 ## Reproduce the Project (Notebooks)
 
 Run in order:
 
-1. **01_data_collection.ipynb**
-
-   - Pull from Kaggle into `data/raw/` and save `data/processed/hr_attrition.parquet`.
-
-2. **02_clean_target.ipynb**
-
-   - Create `target` (Yes→1 / No→0), quick EDA, save `data/processed/hr_attrition_ready.parquet`.
-
-3. **03_train_tune_export.ipynb**
-
-   - Train baseline (LogReg, RF), **grid search RF**, show train+test metrics, export model & features to `artifacts/v1/`.
-
-4. **04_evaluate_and_release.ipynb**
-   - Save **ROC** and **Confusion Matrix** images + **threshold_metrics.csv** to `assets/`.
-
-## Dashboard Design (pages & content)
-
-### **Project Summary**
-
-- Project goal, client requirements, dataset preview + where files were loaded from.
-
-### **Workforce Analysis (BR#1)**
-
-- Filters, bar charts (e.g., OverTime), box plot (e.g., Age), correlation heatmap (numeric).
-- Caption under each plot explaining what to look for.
-
-### **Project Hypotheses**
-
-- **H1:** OverTime → higher attrition (shows rates, clear KPIs, gap, and callout).
-- **H2:** Low JobSatisfaction → higher attrition.
-- **H3:** ≤30 yrs → higher attrition.
-- (Optional) Chi-square p-values if SciPy installed.
-
-### **Attrition Predictor (BR#2)**
-
-- Form with one input per feature → probability + risk band.
-
-### **Technical**
-
-- **ROC-AUC** vs goal line, saved **ROC** and **CM**, threshold table with F1 highlight, live CM slider, and pipeline steps.
-
-## How to Use the Attrition Predictor
-
-The **Attrition Predictor (ML)** page allows you to predict whether an employee is at risk of leaving by entering their profile information.
-
-### **Step-by-Step Guide:**
-
-1. **Navigate to the Predictor**
-
-   - Open the dashboard
-   - Click **"Attrition Predictor (ML)"** in the sidebar
-
-2. **Enter Employee Information**
-   The form has inputs for 15 features across two columns:
-
-   **Numeric Fields** (use number inputs):
-
-   - **Age**: Employee's age in years (e.g., 35)
-   - **MonthlyIncome**: Monthly salary in currency units (e.g., 5000)
-   - **DistanceFromHome**: Distance from home to work in miles/km (e.g., 10)
-   - **TotalWorkingYears**: Total years of professional experience (e.g., 12)
-   - **YearsAtCompany**: Years worked at current company (e.g., 5)
-   - **NumCompaniesWorked**: Number of previous employers (e.g., 3)
-   - **PercentSalaryHike**: Last salary increase percentage (e.g., 15)
-
-   **Categorical Fields** (use dropdowns):
-
-   - **OverTime**: Does the employee work overtime? (Yes/No)
-   - **JobRole**: Current position (e.g., Sales Executive, Research Scientist)
-   - **MaritalStatus**: Marital status (Single/Married/Divorced)
-   - **BusinessTravel**: Travel frequency (Non-Travel/Travel_Rarely/Travel_Frequently)
-   - **Department**: Working department (Sales/Research & Development/Human Resources)
-   - **EducationField**: Field of education (e.g., Life Sciences, Medical, Technical Degree)
-   - **Gender**: Employee gender (Male/Female)
-   - **JobLevel**: Job level ranking (1-5, where 5 is highest)
-
-3. **Get Prediction**
-   - Click the **"Predict"** button at the bottom of the form
-   - The system will display:
-     - **Attrition Probability**: Percentage likelihood of leaving (e.g., 45.2%)
-     - **Risk Band**: Classification into Low/Medium/High risk with visual indicator
-
-### **Understanding the Results:**
-
-**Risk Bands:**
-
-- 🟢 **Low Risk** (< 35%): Employee unlikely to leave - maintain current engagement
-- 🟡 **Medium Risk** (35-59%): Monitor closely - consider retention interventions
-- 🔴 **High Risk** (≥ 60%): Immediate action needed - schedule retention discussion
-
-**Example Interpretation:**
-
-```
-Attrition Probability: 62.5%
-Risk Band: 🔴 High
-
-Action: This employee shows strong indicators of leaving.
-Consider: one-on-one meeting, career development discussion,
-workload review, or compensation adjustment.
-```
-
-### **Tips for Best Results:**
-
-- **Accurate Data**: Ensure all employee information is current and correct
-- **Multiple Scenarios**: Try adjusting factors (e.g., reduce OverTime, increase salary) to see impact on risk
-- **Regular Monitoring**: Re-run predictions quarterly or after major organizational changes
-- **Combine with Insights**: Use the **Workforce Analysis** page to understand which factors matter most
-
-### **Privacy Note:**
-
-Employee profile data entered in this tool is not stored. Predictions are generated in real-time and are not saved to any database.
-
-## Map Business Requirements → Tasks
-
-### **BR#1 (Explain)**
-
-- **User story:** "As HR, I want clear charts so I can see which factors relate to attrition."
-- **Tasks:** grouped bar charts, box plot, correlation heatmap, short captions.
-- **Pages:** Workforce Analysis, Hypotheses.
-
-### **BR#2 (Predict)**
-
-- **User story:** "As HR, I want to enter a profile and see the attrition probability."
-- **Tasks:** build preprocessing + model pipeline, Train/Tune, export, Streamlit form for inputs, risk band.
-- **Pages:** Attrition Predictor (ML), Technical.
-
-## Hypothesis Validation Results
-
-### **H1: OverTime workers leave more - SUPPORTED ✅**
-
-**Evidence:**
-
-- Attrition rate for OverTime=Yes: ~30-31%
-- Attrition rate for OverTime=No: ~10-11%
-- **Gap: ~20 percentage points higher attrition for overtime workers**
-- Chi-square test: p < 0.001 (statistically significant)
-
-**Conclusion:** There is strong statistical evidence that employees working overtime have significantly higher attrition rates. This hypothesis is **SUPPORTED**.
-
-**Recommended Action:** Review overtime policies and workload distribution. Consider limiting mandatory overtime or providing additional compensation/time-off for overtime work.
-
----
-
-### **H2: Lower JobSatisfaction increases attrition - SUPPORTED ✅**
-
-**Evidence:**
-
-- JobSatisfaction level 1 (lowest): ~23% attrition rate
-- JobSatisfaction level 4 (highest): ~11% attrition rate
-- **Progressive decrease in attrition as satisfaction increases**
-- Chi-square test: p < 0.001 (statistically significant)
-
-**Conclusion:** There is a clear inverse relationship between job satisfaction and attrition. Lower satisfaction levels correlate with higher attrition rates. This hypothesis is **SUPPORTED**.
-
-**Recommended Action:** Implement regular satisfaction surveys, identify low-satisfaction teams, and develop targeted retention programs focusing on career development and work environment improvements.
-
----
-
-### **H3: Younger employees (≤30) leave more often - SUPPORTED ✅**
-
-**Evidence:**
-
-- Age ≤30: ~25% attrition rate
-- Age >30: ~13% attrition rate
-- **Gap: ~12 percentage points higher attrition for younger employees**
-- Chi-square test: p < 0.001 (statistically significant)
-
-**Conclusion:** Younger employees demonstrate significantly higher attrition rates compared to their older colleagues. This hypothesis is **SUPPORTED**.
-
-**Recommended Action:** Develop early-career retention programs including mentorship, clear career progression paths, competitive compensation reviews, and engagement initiatives targeted at employees under 30.
-
----
-
-### **Statistical Validation Summary**
-
-All three hypotheses achieved statistical significance (p < 0.05) using chi-square tests of independence, providing strong evidence that the observed patterns are not due to random chance. The business should prioritize interventions addressing overtime practices, job satisfaction, and early-career retention.
-
-## Modeling Summary
-
-### **Approach**
-
-Binary classification using **Random Forest** with a clean **ColumnTransformer**:
-
-- **Numeric:** impute median + scale
-- **Categorical:** impute most_frequent + one-hot (ignore unknowns)
-
-### **Algorithms Evaluated**
-
-We compared two classification algorithms to establish a strong baseline before hyperparameter tuning:
-
-1. **Logistic Regression** (Baseline)
-
-   - **Type:** Linear model with L2 regularization (max_iter=1000)
-   - **ROC-AUC on test set:** ~0.76-0.78 (typical range)
-   - **Strengths:** Fast training, interpretable coefficients, good baseline
-   - **Limitations:** Assumes linear relationships between features and log-odds
-
-2. **Random Forest** (Final Model - Selected)
-   - **Type:** Ensemble of decision trees
-   - **ROC-AUC on test set:** ~0.82-0.85 (after tuning)
-   - **Why chosen:**
-     - Better handles non-linear relationships
-     - Captures complex feature interactions (e.g., Age × OverTime)
-     - More robust to outliers
-     - Provides feature importance rankings
-   - **Trade-off:** Longer training time, less interpretable than LogReg
-
-**Decision:** Random Forest selected as final model due to superior ROC-AUC performance and ability to capture complex patterns in employee behavior.
-
-### **Tuning**
-
-Grid search over ≥6 hyperparameters (each with ≥3 values) for Distinction:
-
-- `n_estimators`, `max_depth`, `min_samples_split`, `min_samples_leaf`, `max_features`, `criterion`
-
-### **Why these params**
-
-They control model complexity (depth/leaves/split), ensemble size (`n_estimators`), feature sampling (`max_features`), and split measure (`criterion`).
-
-## Model Performance
-
-### **Primary metric**
-
-ROC-AUC (goal ≥ 0.75).
-
-### **Where to see it**
-
-Technical page shows AUC and whether the goal is met.
-
-### **Also provided**
-
-- Saved ROC curve
-- Saved confusion matrix @0.50
-- Threshold sweep table (accuracy/precision/recall/F1)
-- Live CM slider
+1. **01_data_collection.ipynb** — Pull from Kaggle into `data/raw/` and save `data/processed/hr_attrition.parquet`.
+2. **02_clean_and_target.ipynb** — Create `target` (Yes to 1, No to 0), quick EDA, save `data/processed/hr_attrition_ready.parquet`.
+3. **03_train_tune_export.ipynb** — Train baseline (Logistic Regression and Random Forest), grid search Random Forest, show train and test metrics, export model and features to `artifacts/v1/`.
+4. **04_evaluate_and_release.ipynb** — Save ROC and confusion matrix images plus `threshold_metrics.csv` to `assets/`.
 
 ## Versioned Artifacts
 
-- Trained model and feature list live under `artifacts/v1/`.
-- Images and tables for the app live under `assets/`.
-- This keeps releases tidy and reproducible.
+- Trained model and feature list: `artifacts/v1/`
+- Evaluation images and tables: `assets/`
+- Processed data: `data/processed/`
 
-## Limitations & Next Steps
+All artifacts are committed to the repository so the deployed app works without re-training.
 
-### **Limitations:**
-
-- Dataset is small and generic; may not reflect your company.
-- Features are limited; no text or time-series data.
-
-### **Next:**
-
-- Align thresholds with HR stakeholders (costs of FP/FN).
-- Try other models (XGBoost, calibrated probabilities).
-- Add monitoring (drift, weekly AUC).
-- Add feature importance/explanations in the app.
-
-## Manual Testing
-
-### A. App starts
-
-- **Run:** `streamlit run app.py`
-- **Expect:** App loads with 5 pages in the sidebar (Summary, Analysis, Hypotheses, ML, Technical).
-
-### B. Summary page
-
-- Shows a small table preview of the dataset.
-- Caption tells you which file was loaded (ready → processed → raw).
-- If no files exist, it shows a friendly message telling you to run Notebook 01–02.
-
-### C. Workforce Analysis (BR#1)
-
-- Filters work (dropdowns don't clash).
-- Charts render:
-  - Bars by category (e.g., OverTime).
-  - Box plot (e.g., Age vs Attrition).
-  - Correlation heatmap (numeric).
-- Each plot has a short caption explaining what to look for.
-
-### D. Hypotheses
-
-- H1 (OverTime) shows KPIs (rates + gap) and a clear callout.
-- H2 (JobSatisfaction) and H3 (Age group) show rates and charts.
-- If SciPy is installed: chi-square p-values are shown. If not, a friendly note appears.
-
-### E. ML Predictor (BR#2)
-
-- The form shows one input per feature (numbers → number input, categories → dropdowns).
-- Clicking Predict returns:
-  - Probability (e.g., 0.62 → 62%),
-  - Risk band (Low/Medium/High) with an icon.
-
-### F. Technical
-
-- Shows ROC-AUC and whether the goal (≥ 0.75) is met.
-- Shows saved ROC and Confusion Matrix images.
-- Shows threshold table (with F1 highlight) and live confusion matrix with a slider.
-- Shows pipeline steps and feature list.
+## Testing
 
 ### How to Run Tests
-
-Run the test suite with:
 
 ```bash
 pytest -q
 ```
 
-### **What's Included:**
+### What Is Included
 
-**1. tests/test_smoke.py**
+**test_smoke.py** — Checks pytest runs at all (simple smoke test).
 
-- Checks pytest runs at all (simple smoke test)
+**test_pages_import.py** — Imports each Streamlit page module to catch syntax and import errors early.
 
-**2. tests/test_pages_import.py**
+**test_utils.py** — Tests the helper that converts Yes/No to 1/0.
 
-- Imports each Streamlit page module to catch syntax/import errors early
+**test_pipeline_fit_predict.py** — Loads a small sample, fits a Logistic Regression pipeline, checks it predicts 0 or 1 without error. Skips automatically if the ready file has not been created yet.
 
-**3. tests/test_utils.py**
+**test_artifacts_exist.py** — Checks that model and asset files exist after training.
 
-- Tests the small helper that converts Yes/No → 1/0
+### Test Configuration
 
-**4. tests/test_pipeline_fit_predict.py**
+`pytest.ini` limits tests to the `tests/` folder.
 
-- Loads 200 rows, fits a tiny Logistic Regression pipeline, checks it predicts 0/1 without error
-- Skips automatically if the ready file isn't there yet
+## Manual Testing
 
-**5. Test Configuration**
+### A. App Starts
 
-- pytest.ini limits tests to the tests/ folder
+Run `streamlit run app.py`. The app loads with 5 pages in the sidebar.
 
-## Error & Bug Fix Log (what went wrong and how we fixed it)
+### B. Summary Page
 
-Below are the common issues we hit during build, with quick fixes.
+Shows a table preview of the dataset, train/test split details, and which file was loaded.
 
-### Kaggle
+### C. Workforce Analysis (BR#1)
 
-#### Symptom: `CalledProcessError` when running `kaggle datasets download`
+Filters work without conflicts. Charts render: grouped bars by category, box plot, attrition rate by category, interactive sunburst (click to drill down), and correlation heatmap. Each plot has a caption explaining what to look for.
 
-- **Cause:** Missing Kaggle login or wrong path.
-- **Fix:** Confirm `~/.kaggle/kaggle.json` exists, re-run the install + download cells, use `-p ../data/raw --unzip`.
+### D. Project Hypotheses
 
-### File paths & imports
+Each hypothesis (H1, H2, H3) shows rates, a bar chart, and a bold SUPPORTED verdict with specific percentages. Chi-square p-values are shown if SciPy is installed. A summary box at the bottom gives all three verdicts and recommended actions.
 
-#### Symptom: `FileNotFoundError: ../data/processed/hr_attrition_ready.parquet`
+### E. Attrition Predictor (BR#2)
 
-- **Cause:** Notebook 02 not run yet.
-- **Fix:** Run NB02 to create the ready parquet.
+The form shows one input per feature. Clicking Predict returns the probability and risk band with an icon.
 
-#### Symptom: `NameError: Path is not defined`
+### F. Technical: Model & Evaluation
 
-- **Cause:** Missing `from pathlib import Path` in that cell.
-- **Fix:** Import Path at the top of the cell.
+Shows ROC-AUC with a clear pass/fail verdict against the 0.75 goal. Shows results metrics (accuracy, precision, recall, F1), classification report, actual vs predicted plot, saved ROC and confusion matrix images, threshold table, and live confusion matrix with a slider. Shows pipeline steps and feature list.
 
-#### Symptom: `ImportError: cannot import name 'RAW_CSV' from src.config`
+## Limitations & Next Steps
 
-- **Cause:** Config variable names didn't match.
-- **Fix:** Standardized names in `src/config.py` and updated pages to import them.
+### Limitations
 
-#### Symptom: `ARTIFACTS_DIR` or `DATA_READY` not defined
+- The dataset is small (1,470 records) and synthetic. It may not reflect your organisation.
+- Features are limited to structured data. No text or time-series features are included.
+- The model was evaluated on the full dataset rather than a held-out test set in the dashboard, so displayed metrics may be optimistic.
 
-- **Cause:** Inconsistent config during refactor.
-- **Fix:** Use a single `config.py` with `ROOT`, `RAW_CSV`, `PROCESSED_PARQUET`, `READY_PARQUET`, `ARTIFACTS_DIR` paths.
+### Next Steps
 
-### Modeling & metrics
+- Align risk band thresholds with HR stakeholders based on the costs of false positives and false negatives.
+- Try other models such as XGBoost or calibrated probabilities.
+- Add monitoring for data drift and weekly AUC tracking.
+- Add feature importance explanations (for example, SHAP values) in the app.
 
-#### Symptom: `AttributeError: 'float' object has no attribute 'round'`
+## Error & Bug Fix Log
 
-- **Cause:** Used `.round(3)` on a Python float.
-- **Fix:** Use `round(value, 3)` or f-strings like `f"{value:.3f}"`.
+### Kaggle Download Error
 
-#### Symptom: Grid search taking too long
+**Symptom:** `CalledProcessError` when running `kaggle datasets download`.
+**Cause:** Missing Kaggle login or wrong path.
+**Fix:** Confirm `~/.kaggle/kaggle.json` exists, re-run the install and download cells, use `-p ../data/raw --unzip`.
 
-- **Cause:** Big parameter grid.
-- **Fix:** Two options:
-  - Keep **big grid** (Distinction-level) and accept the wait.
-  - Or use the **small grid** (faster) and mention it in README.
+### File Not Found for Processed Data
 
-#### Symptom: AUC or confusion matrix not showing live
+**Symptom:** `FileNotFoundError: ../data/processed/hr_attrition_ready.parquet`.
+**Cause:** Notebook 02 not run yet.
+**Fix:** Run Notebook 02 to create the ready parquet.
 
-- **Cause:** Missing artifacts or data.
-- **Fix:** Run **NB03** (exports model) and **NB02** (creates ready parquet), then reload the Technical page.
+### Import Error for Config Variables
 
-### Testing hiccups
+**Symptom:** `ImportError: cannot import name 'RAW_CSV' from src.config`.
+**Cause:** Config variable names did not match.
+**Fix:** Standardised names in `src/config.py` and updated pages to import them.
 
-#### Symptom: Pipeline test skipped
+### NameError in Notebook 03 Grid Search
 
-- **Cause:** Ready parquet not created yet.
-- **Fix:** Run **NB02** to create `hr_attrition_ready.parquet`.
+**Symptom:** `NameError: name 'Pipeline' is not defined` in grid search cells.
+**Cause:** Cells used `Pipeline` and `preproc` without importing them.
+**Fix:** Replaced with `make_rf_pipeline(NUM, CAT)` from `src.pipeline`.
+
+### Float Rounding Error
+
+**Symptom:** `AttributeError: 'float' object has no attribute 'round'`.
+**Cause:** Used `.round(3)` on a Python float.
+**Fix:** Use `round(value, 3)` or f-strings like `f"{value:.3f}"`.
+
+### Grid Search Taking Too Long
+
+**Symptom:** Grid search runs for a very long time.
+**Cause:** Large parameter grid.
+**Fix:** Two options — keep the big grid (thorough) and accept the wait, or use the small grid (faster).
+
+### Model Not Found on Deployed App
+
+**Symptom:** Dashboard shows "Model not found yet" and "Model artifacts not found".
+**Cause:** `.gitignore` excluded `artifacts/*` and `data/processed/*`, so these files were not pushed to GitHub.
+**Fix:** Removed those lines from `.gitignore` and committed the artifact files.
+
+### Pipeline Test Skipped
+
+**Symptom:** Pipeline test is skipped when running pytest.
+**Cause:** Ready parquet not created yet.
+**Fix:** Run Notebook 02 to create `hr_attrition_ready.parquet`.
 
 ## Credits & Resources
 
-### Machine Learning & Mathematics
+### Machine Learning
 
-- **Scikit-learn Documentation:** [https://scikit-learn.org/stable/](https://scikit-learn.org/stable/) - Official ML library documentation
-- **Random Forest Algorithm:** [https://scikit-learn.org/stable/modules/ensemble.html#forest](https://scikit-learn.org/stable/modules/ensemble.html#forest) - Ensemble methods guide
-- **ROC-AUC Explained:** [https://scikit-learn.org/stable/auto_examples/model_selection/plot_roc.html](https://scikit-learn.org/stable/auto_examples/model_selection/plot_roc.html)
+- [Scikit-learn Documentation](https://scikit-learn.org/stable/) — ML library documentation
+- [Random Forest Algorithm](https://scikit-learn.org/stable/modules/ensemble.html#forest) — Ensemble methods guide
+- [ROC-AUC Explained](https://scikit-learn.org/stable/auto_examples/model_selection/plot_roc.html) — ROC curve documentation
 
-### Data Science Resources
+### Data Science
 
-- **Pandas Documentation:** [https://pandas.pydata.org/docs/](https://pandas.pydata.org/docs/) - Data manipulation and analysis
-- **Seaborn Gallery:** [https://seaborn.pydata.org/examples/index.html](https://seaborn.pydata.org/examples/index.html) - Statistical data visualization
-- **Kaggle Learn:** [https://www.kaggle.com/learn](https://www.kaggle.com/learn) - Free micro-courses on data science
+- [Pandas Documentation](https://pandas.pydata.org/docs/) — Data manipulation and analysis
+- [Seaborn Gallery](https://seaborn.pydata.org/examples/index.html) — Statistical data visualisation
+- [Kaggle Learn](https://www.kaggle.com/learn) — Free micro-courses on data science
 
 ### Streamlit & Deployment
 
-- **Streamlit Documentation:** [https://docs.streamlit.io/](https://docs.streamlit.io/) - Interactive web app framework
-- **Streamlit Gallery:** [https://streamlit.io/gallery](https://streamlit.io/gallery) - Community app examples
+- [Streamlit Documentation](https://docs.streamlit.io/) — Interactive web app framework
+- [Streamlit Gallery](https://streamlit.io/gallery) — Community app examples
 
 ### Dataset
 
-- **Original Dataset:** [IBM HR Analytics Employee Attrition & Performance](https://www.kaggle.com/datasets/pavansubhasht/ibm-hr-analytics-attrition-dataset) - Kaggle dataset used in this project
+- [IBM HR Analytics Employee Attrition & Performance](https://www.kaggle.com/datasets/pavansubhasht/ibm-hr-analytics-attrition-dataset) — Kaggle dataset used in this project
 
-### Special Thanks
+### Acknowledgements
 
-- **Code Institute** - For the comprehensive Predictive Analytics and Machine Learning course
-- **Kaggle Community** - For providing high-quality datasets and notebooks
-- **Open Source Contributors** - For maintaining the amazing Python data science ecosystem
+- Code Institute — for the Predictive Analytics and Machine Learning course
+- Kaggle Community — for providing high-quality datasets and notebooks
+- Open Source Contributors — for maintaining the Python data science ecosystem
