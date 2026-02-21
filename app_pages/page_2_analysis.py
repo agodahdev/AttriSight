@@ -47,9 +47,7 @@ def run():
         return
 
     df = _ensure_target(df)
-    st.caption(f"Loaded from: `{src.relative_to(ROOT)}` • "
-               Rows: {len(df):,} • Columns: {len(df.columns)}"
-               )
+    st.caption(f"Loaded from: `{src.relative_to(ROOT)}` - Rows: {len(df):,} - Columns: {len(df.columns)}")
 
      # Filters (affect all charts below)
     
@@ -105,8 +103,6 @@ def run():
 
   
      # 2) Attrition rate by category (interactive Plotly bar)
-    #    Assessor asked for interactive plots — this one has hover info
-    # ==================================================================
     st.subheader("Attrition rate by category")
     if cat_choices:
         cat2 = st.selectbox("Choose category", cat_choices, index=0,
@@ -136,9 +132,9 @@ def run():
             "Red bars indicate higher attrition risk."
         )
 
-    # ==================================================================
+ 
     # 3) Numeric distribution (box plot)
-    # ==================================================================
+  
     st.subheader("Numeric distribution by attrition")
     num_choices = [c for c in SUGGESTED_NUM if c in dff.columns]
     if not num_choices:
@@ -155,10 +151,7 @@ def run():
             "that feature may matter for attrition."
         )
 
-    # ==================================================================
     # 4) Interactive sunburst chart (drill-down by clicking)
-    #    This clearly satisfies merit criterion 6.5 — interactive plot
-    # ==================================================================
     st.divider()
     st.subheader("Interactive Sunburst — Attrition by Department, JobRole & OverTime")
     st.markdown("""
@@ -186,9 +179,9 @@ def run():
     else:
         st.info("Sunburst requires Department, JobRole, OverTime and Attrition columns.")
 
-    # ==================================================================
+    
     # 5) Correlation heatmap (numeric features + target)
-    # ==================================================================
+   
     st.divider()
     st.subheader("Correlation heatmap (numeric features)")
     if "target" not in dff.columns and "Attrition" in dff.columns:
