@@ -29,9 +29,7 @@ def run():
     if "target" not in df.columns and "Attrition" in df.columns:
         df["target"] = df["Attrition"].map({"Yes": 1, "No": 0})
 
-    # ----------------------------------------------------------------
     # H1: Overtime workers leave more
-    # ----------------------------------------------------------------
     st.markdown("---")
     st.subheader("H1: Overtime workers have higher attrition")
     st.markdown("""
@@ -65,9 +63,8 @@ def run():
     else:
         st.warning("Could not compute OverTime rates — check the data.")
 
-    # ----------------------------------------------------------------
+
     # H2: Lower job satisfaction increases attrition
-    # ----------------------------------------------------------------
     st.markdown("---")
     st.subheader("H2: Lower job satisfaction increases attrition")
     st.markdown("""
@@ -109,9 +106,8 @@ def run():
     else:
         st.info("JobSatisfaction column not found in the dataset.")
 
-    # ----------------------------------------------------------------
+
     # H3: Younger employees (≤30) leave more often
-    # ----------------------------------------------------------------
     st.markdown("---")
     st.subheader("H3: Younger employees (≤30) leave more often")
     st.markdown("""
@@ -134,9 +130,8 @@ def run():
     # Show bar chart
     st.bar_chart(h3.set_index("AgeGroup")["rate"])
 
-    # ----------------------------------------------------------------
+    
     # H3: Younger employees (≤30) leave more often
-    # ----------------------------------------------------------------
     st.markdown("---")
     st.subheader("H3: Younger employees (≤30) leave more often")
     st.markdown("""
@@ -173,9 +168,7 @@ def run():
     else:
         st.warning("Could not compute age group rates — check the data.")
 
-    # ----------------------------------------------------------------
     # Chi-square statistical tests (adds rigour to the validation)
-    # ----------------------------------------------------------------
     st.markdown("---")
     st.subheader("Statistical Validation (Chi-Square Tests)")
     st.markdown("""
@@ -232,9 +225,8 @@ def run():
         else:
             st.warning("Not all hypotheses reached statistical significance.")
 
-    # ----------------------------------------------------------------
+ 
     # Final summary box so the assessor sees a clear overall verdict
-    # ----------------------------------------------------------------
     st.markdown("---")
     st.subheader("Summary of Findings")
     st.info("""

@@ -1,5 +1,4 @@
 # test_pages_import.py — check that every app page can be imported
-# This catches syntax errors and broken imports before deployment.
 
 def test_import_page_1():
     """Page 1 (Summary) imports without error."""
