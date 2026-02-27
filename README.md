@@ -207,6 +207,63 @@ ROC-AUC value with pass/fail verdict against the 0.75 goal, results metrics card
 
 Employee profile data entered in this tool is not stored. Predictions are generated in real time and are not saved to any database.
 
+## Deployment
+
+### Heroku Deployment
+
+This project was deployed using GitHub and Heroku:
+
+1. Fork or clone this repository.
+2. Log in to [Heroku](https://heroku.com) and create a new app.
+3. In the **Deploy** tab, select **GitHub** as the deployment method.
+4. Search for and connect to the `AttriSight` repository.
+5. Click **Deploy Branch** (main).
+6. Once the build is complete, click **Open App** to view the live dashboard.
+
+The live app is here: (https://attrisight-404abf5f2e34.herokuapp.com)
+
+### Run Locally
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/agodahdev/AttriSight.git
+cd AttriSight
+```
+
+2. Create and activate a virtual environment:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+```
+
+On Windows use:
+
+```bash
+.venv\Scripts\activate
+```
+
+3. Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+4. Run the app:
+
+```bash
+streamlit run app.py
+```
+
+5. Open your browser at `http://localhost:8501`.
+
+6. (Optional) Run tests:
+
+```bash
+pytest -q
+```
+
 ## Reproduce the Project (Notebooks)
 
 Run in order:
